@@ -218,16 +218,39 @@ def tobinary(dataIN):
     """
     Compresses a string containing binary code to its real binary value.
     """
-    # FIXME
-    pass
+    index = 0
+    res = ""
+    full = len(dataIN) // 8
+    while index < 8 * full:
+        s = ""
+        i = 0
+        while i < 8:
+            s += dataIN[index]
+            i += 1
+            index += 1
+        res += __binarytochar(s)
+    reste = len(dataIN) % 8
+    i = 0
+    s = ""
+    while i < reste:
+        s += '0'
+        i += 1
+    align = i
+    index = len(dataIN) - reste
+    while i < 8:
+        s += dataIN[index]
+        i += 1
+        index += 1
+    res += __binarytochar(s)
+    return res, align
 
 
 def compress(dataIn):
     """
     The main function that makes the whole compression process.
     """
-
-    # FIXME
+    freqList = buildfrequencylist(dataIn)
+    huffmanTree = buildHuffmantree(freqList)
     pass
 
 
@@ -266,7 +289,7 @@ def decodedata(huffmanTree, dataIN):
     return res
 
 
-def binarytochar(binarystring):
+def __binarytochar(binarystring):
     """
     :param binarystring: a binary ascii code
     :return: the character of the binary ascii code
@@ -282,22 +305,102 @@ def binarytochar(binarystring):
     return chr(res)
 
 
+def __reverseList(L):
+    """
+    :param L: a list
+    :return: the list reverse
+    """
+    Lres = []
+    indexL = len(L) - 1
+    while indexL >= 0:
+        Lres.append(L[indexL])
+        indexL -= 1
+    L = Lres
+    return L
+
+
+def __charlist(dataIN):
+    """
+    :param dataIN: the encoded tree
+    :return: a tuple (list of char, structure string)
+    """
+    L = []
+    index = 0
+    structure = []
+    while index < len(dataIN):
+        s = ""
+        if dataIN[index] == '1':
+            structure.append(dataIN[index])
+            index += 1
+            i = index
+            while i < index + 8:
+                s += dataIN[i]
+                i += 1
+            index += 8
+            L.append(__binarytochar(s))
+        else:
+            structure.append(dataIN[index])
+            index += 1
+    L = __reverseList(L)
+    structure = __reverseList(structure)
+    return L, structure
+
+
+def __decodetree(charlist, structure):
+    """
+    :param dataIN: the encoded data
+    :param B: the new tree
+    :param index: the index to go through the data
+    :return: the tree
+    """
+    if len(structure) <= 0:
+        return None
+    index_struct = len(structure) - 1
+    if structure[index_struct] == '1':
+        structure.pop()
+        index = len(charlist) - 1
+        key = charlist[index]
+        charlist.pop()
+        B = bintree.BinTree(key, None, None)
+        return B
+    elif structure[index_struct] == '0':
+        structure.pop()
+        B = bintree.BinTree(None, None, None)
+        B.left = __decodetree(charlist, structure)
+        B.right = __decodetree(charlist, structure)
+        return B
+    return None
+
+
 def decodetree(dataIN):
     """
     Decodes a huffman tree from its binary representation:
         * a '0' means we add a new internal node and go to its left node
         * a '1' means the next 8 values are the encoded character of the current leaf         
     """
-    # FIXME
-    pass
+    (charlist, structure) = __charlist(dataIN)
+    return __decodetree(charlist, structure)
 
 
 def frombinary(dataIN, align):
     """
     Retrieve a string containing binary code from its real binary value (inverse of :func:`toBinary`).
     """
-    # FIXME
-    pass
+    index = 0
+    res = ""
+    while index < len(dataIN) - 1:
+        char = __chartobin(dataIN[index])
+        res += char
+        index += 1
+    s = __chartobin(dataIN[index])
+    i = 0
+    while i < len(s):
+        if i < align:
+            i += 1
+            continue
+        res += s[i]
+        i += 1
+    return res
 
 
 def decompress(data, dataAlign, tree, treeAlign):
