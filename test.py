@@ -1,6 +1,5 @@
 import huffman
 import Huffman_tree
-import huffman2
 
 
 def printTree(B, s=""):
@@ -38,4 +37,6 @@ tobinary, align = huffman.tobinary(encodedata)
 #print(tobinary)
 frombinary = huffman.frombinary(tobinary, align)
 #print(frombinary)
-
+((dataComp, dataAlign), (treeComp, treeAlign)) = huffman.compress(data)
+decompress = huffman.decompress(dataComp, dataAlign, treeComp, treeAlign)
+print(decompress)

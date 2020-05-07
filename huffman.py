@@ -218,31 +218,31 @@ def tobinary(dataIN):
     """
     Compresses a string containing binary code to its real binary value.
     """
-    index = 0
+    length = len(dataIN) - 1
+    full = length // 8
     res = ""
-    full = len(dataIN) // 8
-    while index < 8 * full:
+    nbChar = 0
+    index = 0
+    while nbChar < full:
         s = ""
-        i = 0
-        while i < 8:
+        index2 = 0
+        while index2 < 8:
             s += dataIN[index]
-            i += 1
+            index2 += 1
             index += 1
         res += __binarytochar(s)
-    reste = len(dataIN) % 8
-    i = 0
+        nbChar += 1
+    reste = length % 8 + 1
+    nb0 = 8 - reste
     s = ""
-    while i < reste:
+    while nb0 > 0:
         s += '0'
-        i += 1
-    align = i
-    index = len(dataIN) - reste
-    while i < 8:
+        nb0 -= 1
+    while index <= length:
         s += dataIN[index]
-        i += 1
         index += 1
     res += __binarytochar(s)
-    return res, align
+    return res, 8 - reste
 
 
 def compress(dataIn):
@@ -251,8 +251,9 @@ def compress(dataIn):
     """
     freqList = buildfrequencylist(dataIn)
     huffmanTree = buildHuffmantree(freqList)
-    pass
-
+    dataencoded = encodedata(huffmanTree, dataIn)
+    treeencoded = encodetree(huffmanTree)
+    return tobinary(dataencoded), tobinary(treeencoded)
 
 ################################################################################
 ## DECOMPRESSION
@@ -407,5 +408,7 @@ def decompress(data, dataAlign, tree, treeAlign):
     """
     The whole decompression process.
     """
-    # FIXME
-    pass
+    fromBdata = frombinary(data, dataAlign)
+    fromBtree = frombinary(tree, treeAlign)
+    decodedtree = decodetree(fromBtree)
+    return decodedata(decodedtree, fromBdata)
