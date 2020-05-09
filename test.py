@@ -1,5 +1,16 @@
 import huffman
 import Huffman_tree
+import random
+import time
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print(f.__name__, 'function took',(time2-time1)*1000.0,'ms')
+        return ret, (time2-time1)*1000.0
+    return wrap
 
 
 def printTree(B, s=""):
@@ -40,3 +51,14 @@ frombinary = huffman.frombinary(tobinary, align)
 ((dataComp, dataAlign), (treeComp, treeAlign)) = huffman.compress(data)
 decompress = huffman.decompress(dataComp, dataAlign, treeComp, treeAlign)
 print(decompress)
+
+fichier = open('bonjour.txt', 'r')
+s = ""
+for ligne in fichier:
+    s += ligne
+
+fichier.close()
+
+print(s, len(s))
+res = huffman.compress(s)
+print(res)
