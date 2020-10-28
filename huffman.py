@@ -1,22 +1,5 @@
-__license__ = 'Junior (c) EPITA'
-__docformat__ = 'reStructuredText'
-__revision__ = '$Id: huffman.py 2019-04-01'
-
-"""
-Huffman homework
-2019
-@author: login
-"""
-
 from algopy import bintree
 from algopy import heap
-
-
-###############################################################################
-# Do not change anything above this line, except your login!
-# Do not add any import
-
-###############################################################################
 ## COMPRESSION
 
 def __frequency(dataIN, c):
@@ -255,7 +238,6 @@ def compress(dataIn):
     treeencoded = encodetree(huffmanTree)
     return tobinary(dataencoded), tobinary(treeencoded)
 
-################################################################################
 ## DECOMPRESSION
 def __charintree(B, dataIn, index):
     valid = True
